@@ -1,11 +1,14 @@
-import "@stdlib/deploy";
-
-
 struct Log {
     id: Int as uint64;
     date: Int as uint64;
     action: String;
     actor: Address;
+}
+
+message DoLog {
+   adr: Address; 
+   act: String; 
+   i: Int;
 }
 
 trait Loggable {
@@ -21,6 +24,10 @@ trait Loggable {
         }; 
         self.logs.set(i,log);
         return log;
+    }
+
+    receive(msg: DoLog) {
+        self._log(msg.adr, msg.act, msg.i);
     }
 
     get fun showLogs(): map<Int, Log> {
