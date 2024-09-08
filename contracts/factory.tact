@@ -1,9 +1,10 @@
-import "@stdlib/deploy";
+mport "@stdlib/deploy";
 import "./admins.tact";
 import "./logs.tact";
-import "./users.tact";
+import "./freinds.tact";
 
-contract Factory with Deployable, Administratable, Loggable, Accountable {
+
+contract Factory with Deployable, Administratable, Loggable, Relatable {
 
     // Administratable required Vars
     root: Address;
@@ -15,14 +16,17 @@ contract Factory with Deployable, Administratable, Loggable, Accountable {
 
     // Accountable required Vars
     users: map<Address, Account>;
-    u: Int as uint64;
+    uids: map<Int,Bool>;
+
+    followers: map<Int, Follower>;
 
     init() {
         self.l = 0;
-        self.u = 0;
         self.root = newAddress(0,0);
         self.admins = emptyMap(); 
         self.users = emptyMap();
+        self.uids = emptyMap();
+        self.followers = emptyMap();
         self._setRoot(sender());
         self._log(self.root,"Root Initialisation !",self.l);
         self.l += 1;
