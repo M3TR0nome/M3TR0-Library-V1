@@ -11,6 +11,7 @@ struct Account {
     avatar: String;
     joined: Int? = null;
     score: Score;
+    uid: Int as uint256;
 }
 
 message NewAccount {
@@ -37,6 +38,7 @@ message DeleteAccount {
 trait Accountable {
 
     users: map<Address, Account>;
+    uids: map<Int, Bool>;
 
     receive(msg:NewAccount) {
         let jc: Account = self.users.get(sender())!!;
@@ -46,14 +48,20 @@ trait Accountable {
                 liquidity: 0,
                 activity: 0
             };
+            let uid: Int = random(100000,999999);
+            /*while(self.uids.get(uid) != false) {
+                uid = random(100000,999999);
+            }*/
             let acc: Account = Account {
                 adr: sender(),
                 handle: msg.handle,
                 status: msg.status,
                 avatar: msg.avatar,
                 joined: now(),
-                score: sc
+                score: sc,
+                uid: uid
             };
+
         self.users.set(sender(),acc);
     }
 
@@ -71,7 +79,8 @@ trait Accountable {
                 status: msg.status,
                 avatar: msg.avatar,
                 joined: jc.joined,
-                score: sc
+                score: sc,
+                uid: jc.uid
             };
         self.users.set(sender(),acc);
     }
@@ -79,7 +88,13 @@ trait Accountable {
     receive(msg:DeleteAccount) {
         let jc: Account = self.users.get(sender())!!;
         if(msg.permanent == true) {
-            jc.joined = emptyMap();
+            jc.joined = 0;
+            let sc: Score = Score {
+                community: 0,
+                liquidity: 0,
+                activity: 0
+            };
+            jc.score = sc;
         }
         let acc: Account = Account {
                 adr: sender(),
@@ -87,8 +102,10 @@ trait Accountable {
                 status: "",
                 avatar: "",
                 joined: jc.joined,
-                score: jc.score
+                score: jc.score,
+                uid: jc.uid
             };
+        self.users.set(sender(),acc);
     }
 
     get fun showUsers(): map<Address, Account> {
@@ -96,6 +113,10 @@ trait Accountable {
     }
 
     get fun showAccountByAdr(adr: Address): Account {
+        return self._getAccountByAdr(adr);
+    }
+
+    fun _getAccountByAdr(adr: Address): Account {
         return self.users.get(adr)!!;
     }
 
