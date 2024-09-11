@@ -2,6 +2,7 @@ import "@stdlib/deploy";
 import "./admins.tact";
 import "./logs.tact";
 import "./freinds.tact";
+import "./groups.tact";
 
 
 contract Factory with Deployable, Administratable, Loggable, Relatable {
