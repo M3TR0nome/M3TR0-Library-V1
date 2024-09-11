@@ -1,9 +1,9 @@
 import "./users.tact";
 
 struct Follower {
-    id: Int as uint64;
+    uid: Int as uint256;
     follower: Address;
-    following: Address;
+    following: map<Int, Address>;
 }
 
 message Follow {
@@ -16,7 +16,10 @@ trait Relatable with Accountable {
     users: map<Address, Account>;
     uids: map<Int,Bool>;
 
-    followers: map<Int, Follower>;
-    // r: Int as uint64;
+    follow: map<Int, Follower>;
 
+    get fun showFreindsByAdr(adr: Address): Follower {
+        let acc: Account = self._getAccountByAdr(adr);
+        return self.follow.get(acc.uid)!!;
+    }
 }
